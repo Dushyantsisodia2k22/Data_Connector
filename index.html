@@ -1,0 +1,75 @@
+
+  <!DOCTYPE html>
+<html>
+<head>
+  <title>Fetch ThingSpeak Data to Firebase</title>
+</head>
+<body>
+  <h1>Fetch ThingSpeak Data to Firebase</h1>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      // Your Firebase config here
+      apiKey: "AIzaSyCBXp6LE75zLXnf-8wR9e2ZGeJr-03uTyU",
+          authDomain: "busdata-358b6.firebaseapp.com",
+          databaseURL: "https://busdata-358b6-default-rtdb.firebaseio.com",
+          projectId: "busdata-358b6",
+          storageBucket: "busdata-358b6.appspot.com",
+          messagingSenderId: "965327406000",
+          appId: "1:965327406000:web:b890393af6d5e09a774c75",
+    };
+
+    // Initialize Firebase app
+    firebase.initializeApp(firebaseConfig);
+
+    // Function to write data to Firebase Realtime Database
+    function writeToFirebase(logValue, latValue) {
+      firebase.database().ref('gsm/log').set(logValue)
+        .then(() => {
+          console.log('Data written to Firebase (log).');
+        })
+        .catch(error => {
+          console.error('Error writing data to Firebase (log):', error);
+        });
+
+      firebase.database().ref('gsm/lat').set(latValue)
+        .then(() => {
+          console.log('Data written to Firebase (lat).');
+        })
+        .catch(error => {
+          console.error('Error writing data to Firebase (lat):', error);
+        });
+    }
+
+    // Function to fetch data from ThingSpeak and write to Firebase
+    function fetchDataAndWriteToFirebase() {
+      fetch('https://api.thingspeak.com/channels/2218369/feeds.json?api_key=2D1IHAV96ADE2GNY')
+        .then(response => response.json())
+        .then(data => {
+          // Get the last entry from the ThingSpeak feeds array
+          const lastEntry = data.feeds[data.feeds.length - 1];
+          const logValue = lastEntry.field1;
+          const latValue = lastEntry.field2;
+
+          // Write data to Firebase
+          writeToFirebase(logValue, latValue);
+
+          // Fetch data from ThingSpeak again after a short delay (e.g., 5 seconds)
+          setTimeout(fetchDataAndWriteToFirebase, 5000);
+        })
+        .catch(error => {
+          console.error('Error fetching data from ThingSpeak:', error);
+          // Retry fetching data after a short delay (e.g., 5 seconds)
+          setTimeout(fetchDataAndWriteToFirebase, 5000);
+        });
+    }
+
+    // Start fetching data from ThingSpeak and writing to Firebase
+    fetchDataAndWriteToFirebase();
+  </script>
+</body>
+</html>
