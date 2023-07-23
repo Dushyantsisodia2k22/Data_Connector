@@ -28,7 +28,7 @@
 
     // Function to write data to Firebase Realtime Database
     function writeToFirebase(logValue, latValue) {
-      firebase.database().ref('gsm/log').set(logValue)
+      firebase.database().ref('Bus_Data/Kosi Kalan/2/long').set(logValue)
         .then(() => {
           console.log('Data written to Firebase (log).');
         })
@@ -36,7 +36,7 @@
           console.error('Error writing data to Firebase (log):', error);
         });
 
-      firebase.database().ref('gsm/lat').set(latValue)
+      firebase.database().ref('Bus_Data/Kosi Kalan/2/lat').set(latValue)
         .then(() => {
           console.log('Data written to Firebase (lat).');
         })
@@ -63,7 +63,7 @@
         })
         .catch(error => {
           console.error('Error fetching data from ThingSpeak:', error);
-          // Retry fetching data after a short delay (e.g., 5 seconds)
+          // Retry fetching data after a short delay (e.g., 1 seconds)
           setTimeout(fetchDataAndWriteToFirebase, 1000);
         });
     }
